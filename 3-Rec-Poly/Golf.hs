@@ -33,7 +33,7 @@ localMaxima :: [Integer] -> [Integer]
 localMaxima xs = [xs!!n | n <- [1,2..length xs -2], 
                           xs!!n > xs!!(n-1), xs!!n > xs!!(n+1)]
 
--- EXERCISE 3: Histogram
+-- EXERCISE 3: Histogram [BETTER SOLUTION - ORIGINAL SOL IN PREV COMMIT]
 -- =====================
 
 -- Count of the number `n` in list `xs`
@@ -50,57 +50,15 @@ count xs num = sum [ 1 | x <- xs, x == num ]
 extract :: [Integer] -> [Integer]
 extract xs = [count xs num | num <- [0,1..9]]
 
--- Create a string with * at particular indices
--- > createString [4,7,9]       == "    *  * *"
--- > createString [0,1,4,7,9]   == "**  *  * *"
--- > createString [0,1,4,7,8,9] == "**  *  ***"
--- > Which is similar to:
--- > **  *  ***
--- > 0123456789
-createString :: [Integer] -> String
-createString [] = ""
-createString (x:rest) =
-    (replicate (fromIntegral x) ' ' ++ "*") ++ suffixString (x:rest)
-
-suffixString :: [Integer] -> String
-suffixString (x:[])     = "\n"
-suffixString (x:y:rest) = 
-    replicate (fromIntegral (y-x-1)) ' ' ++ "*" ++ suffixString(y:rest)
-
--- Indices of the elems that has the maximum value
-getElemIndices :: [Integer] -> Integer -> [Integer]
-getElemIndices [] _   = []
-getElemIndices xs num = 
-    [fromIntegral n | n <- [0,1..length xs-1], xs !!n == num]
-
--- Update Numbers count
--- After a single run on the list, reduce the elem with max value in list by 1
-updateNumberCount :: [Integer] -> [Integer] -> [Integer]
-updateNumberCount xs maxElemIndices =
-    [if (fromIntegral n) `elem` maxElemIndices then (xs!!n) -1 else xs!!n 
-                                            | n <- [0,1..length xs -1]]
-                                              
--- Create the Histogram
--- Build the Histogram horizontally, starting from the top
--- Get the indexes which has the maximum value. Draw a `*` at those indices
--- Then move down one layer, that means draw a start at those indices where
--- the the values is maximum value - 1
-type NumbersCount = [Integer]
-
-createHistogram :: NumbersCount -> Integer -> String
-createHistogram xs 0 =
-    let equalString = (replicate 10 '=') ++ "\n"
-        indexString = "0123456789\n" in
-        equalString ++ indexString
-createHistogram xs maxElem = 
-    let maxElemIndices = getElemIndices xs maxElem 
-        updatedXS = updateNumberCount xs maxElemIndices in
-    createString maxElemIndices ++ createHistogram updatedXS (maxElem - 1)
+-- Draw a single line
+line :: [Integer] -> Integer -> String
+line xs n = [ if x  >= n then '*' else ' '| x <- xs]
 
 -- Histogram
 histogram :: [Integer] -> String
-histogram [] = ""
-histogram xs = 
-    let numbersCount = extract xs
-        maxElem      = maximum xs in
-        createHistogram numbersCount maxElem
+histogram xs = unlines (map (line numberCount) [m,m-1..1]) ++ equalString ++ indexString
+    where numberCount = extract xs
+          m = maximum numberCount
+          equalString = replicate 10 '=' ++ "\n"
+          indexString = "0123456789\n"
+          

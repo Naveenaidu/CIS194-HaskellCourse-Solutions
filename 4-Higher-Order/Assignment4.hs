@@ -72,3 +72,27 @@ myFoldl f base xs = foldr (\x acc -> f acc x) base (reverse xs)
 -- A better verion for flip suggested by hlint
 -- myFold2 :: (a -> b -> a) -> a -> [b] -> a
 -- myFold2 f base xs = foldr (flip f) base $ reverse xs
+
+-- EXERCISE 4: Finding Primes
+-- ==========================
+
+-- > Cartesian Product
+cartProd :: [a] -> [b]  -> [(a,b)]
+cartProd xs ys = [(x,y) | x <- xs, y <- ys]
+
+-- > Sieve of Sundaram
+--- > Get the (i,j) of all the elements that satisfies the condition 
+--- > i + j + 2*i*j > nNew. Then using these i,j make the list number that is 
+--- > described in the format of i + j + 2*i*j. Let's assume this list as
+--- > `nonPrime`.
+--- > Now from the list of [3..n], remove the numbers that are present in the
+--- > the `nonPrime list.
+--- > NOTE: sieveSundaram's algo does not create 2 as the prime number in list,
+--- >       hence add 2 to the start of the list.
+sieveSundaram :: Integer -> [Integer]
+sieveSundaram n = 2 : ( map (\x -> 2 * x + 1) $ [1..nNew] \\ nonPrime )
+            where 
+                  nonPrime = map (\(i,j) -> i + j + 2*i*j)
+                             . filter (\(i,j) -> i + j + 2*i*j <= nNew) $ xs
+                  nNew = (n-2) `div` 2
+                  xs = cartProd [1,2..nNew] [1,2..nNew]
